@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erah AI — Vector & Matrix Math Interactive Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-badge">01</div>
+                <div>
+                    <h1>Erah AI <span>// Foundations Lab</span></h1>
+                    <p class="subtitle">Pillar 1: Interactive Vector Math, L2 Norm, Dot Product & Cosine Similarity</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge badge-primary">NumPy Mechanics</span>
+                <span class="badge badge-secondary">Interactive Mode</span>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="visualizer">1. 2D Vector Visualizer</button>
+            <button class="tab-btn" data-tab="math-breakdown">2. Step-by-Step Math</button>
+            <button class="tab-btn" data-tab="text-similarity">3. Real Text Data Samples</button>
+            <button class="tab-btn" data-tab="exercises">4. Hands-on Exercises (4)</button>
+        </nav>
+
+        <!-- Tab 1: 2D Vector Visualizer -->
+        <main class="tab-content active" id="tab-visualizer">
+            <div class="grid-2col">
+                <!-- Left: Canvas Area -->
+                <div class="card canvas-card">
+                    <div class="card-header">
+                        <h2>Interactive 2D Vector Plane</h2>
+                        <span class="hint">Click & drag vector heads or edit inputs</span>
+                    </div>
+                    <div class="canvas-wrapper">
+                        <canvas id="vectorCanvas" width="500" height="500"></canvas>
+                        <div class="canvas-legend">
+                            <span class="legend-item"><span class="dot vec-a"></span> Vector A (Blue)</span>
+                            <span class="legend-item"><span class="dot vec-b"></span> Vector B (Purple)</span>
+                            <span class="legend-item"><span class="dot vec-angle"></span> Angle &theta;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Vector Controls & Real-time Metrics -->
+                <div class="card metrics-card">
+                    <div class="card-header">
+                        <h2>Live Vector Controls & Metrics</h2>
+                    </div>
+                    
+                    <!-- Vector Inputs -->
+                    <div class="vector-inputs">
+                        <div class="input-group vec-a-group">
+                            <label>Vector A (x, y):</label>
+                            <div class="input-row">
+                                <span>Ax:</span>
+                                <input type="number" id="ax" value="3" step="0.5" min="-5" max="5">
+                                <span>Ay:</span>
+                                <input type="number" id="ay" value="2" step="0.5" min="-5" max="5">
+                            </div>
+                        </div>
+                        <div class="input-group vec-b-group">
+                            <label>Vector B (x, y):</label>
+                            <div class="input-row">
+                                <span>Bx:</span>
+                                <input type="number" id="bx" value="1" step="0.5" min="-5" max="5">
+                                <span>By:</span>
+                                <input type="number" id="by" value="4" step="0.5" min="-5" max="5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Presets -->
+                    <div class="preset-buttons">
+                        <label>Quick Presets:</label>
+                        <div class="btn-group">
+                            <button class="btn-sm" onclick="setVectors(3, 2, 3, 2)">Identical (&theta; = 0°)</button>
+                            <button class="btn-sm" onclick="setVectors(3, 0, 0, 3)">Orthogonal (&theta; = 90°)</button>
+                            <button class="btn-sm" onclick="setVectors(3, 2, -3, -2)">Opposite (&theta; = 180°)</button>
+                            <button class="btn-sm" onclick="setVectors(4, 1, 2, 3)">Custom</button>
+                        </div>
+                    </div>
+
+                    <!-- Computed Live Values -->
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">Dot Product (A &middot; B)</div>
+                            <div class="metric-value" id="val-dot">11.00</div>
+                            <div class="metric-desc">Ax&middot;Bx + Ay&middot;By</div>
+                        </div>
+                        <div class="metric-box highlight">
+                            <div class="metric-label">Cosine Similarity</div>
+                            <div class="metric-value highlight-val" id="val-cos">0.743</div>
+                            <div class="metric-desc">cos(&theta;) range: [-1, +1]</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Angle &theta;</div>
+                            <div class="metric-value" id="val-angle">42.0°</div>
+                            <div class="metric-desc">Geometric separation</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Euclidean Distance</div>
+                            <div class="metric-value" id="val-euc">2.83</div>
+                            <div class="metric-desc">Straight-line distance ||A - B||</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Magnitude ||A|| (L2 Norm)</div>
+                            <div class="metric-value" id="val-norm-a">3.61</div>
+                            <div class="metric-desc">&radic;(Ax&sup2; + Ay&sup2;)</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Magnitude ||B|| (L2 Norm)</div>
+                            <div class="metric-value" id="val-norm-b">4.12</div>
+                            <div class="metric-desc">&radic;(Bx&sup2; + By&sup2;)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Tab 2: Step-by-Step Math Breakdown -->
+        <main class="tab-content" id="tab-math-breakdown">
+            <div class="card math-card">
+                <div class="card-header">
+                    <h2>Step-by-Step Mathematical Computation</h2>
+                    <span class="hint">Watch how raw numbers transform through formulas</span>
+                </div>
+                
+                <div class="math-steps-container" id="mathSteps">
+                    <!-- Dynamic math breakdown inserted by JS -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Tab 3: Real Text Data Samples -->
+        <main class="tab-content" id="tab-text-similarity">
+            <div class="card text-sim-card">
+                <div class="card-header">
+                    <h2>Real-World Text & Intent Similarity Lab</h2>
+                    <span class="hint">See how natural language sentences convert to numbers and vector similarity</span>
+                </div>
+
+                <div class="text-inputs-grid">
+                    <div class="text-input-box">
+                        <label>Sentence 1 (Text A):</label>
+                        <textarea id="textA" rows="3">How can I request a refund for my billing charge?</textarea>
+                        <div class="text-presets">
+                            <button class="btn-micro" onclick="setTextPreset('billing')">Preset: Billing Pair</button>
+                            <button class="btn-micro" onclick="setTextPreset('cross')">Preset: Cross-Topic (Diff)</button>
+                        </div>
+                    </div>
+                    <div class="text-input-box">
+                        <label>Sentence 2 (Text B):</label>
+                        <textarea id="textB" rows="3">Please issue an invoice and refund receipt for my payment.</textarea>
+                        <div class="text-presets">
+                            <button class="btn-micro" onclick="setTextPreset('tech')">Preset: Tech Support Pair</button>
+                            <button class="btn-micro" onclick="setTextPreset('sales')">Preset: Sales Pair</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn-primary" id="btnComputeText">Compute Text Vector Similarity</button>
+                </div>
+
+                <div id="textResultsArea" class="text-results-area">
+                    <!-- Text similarity result -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Tab 4: Hands-on Exercises -->
+        <main class="tab-content" id="tab-exercises">
+            <div class="card exercises-card">
+                <div class="card-header">
+                    <h2>Pillar 1 Mastery Exercises & Quizzes</h2>
+                    <div class="score-tracker">Score: <span id="exerciseScore">0</span> / 4 Completed</div>
+                </div>
+
+                <div class="exercise-list">
+                    <!-- Ex 1 -->
+                    <div class="exercise-item" id="ex1">
+                        <div class="ex-badge">Exercise 1: Dot Product Manual Calculation</div>
+                        <p class="ex-question">
+                            Given vector $\mathbf{u} = [4, 3]$ and vector $\mathbf{v} = [2, -1]$, what is the exact Dot Product $\mathbf{u} \cdot \mathbf{v}$?
+                        </p>
+                        <div class="ex-interactive">
+                            <input type="number" id="ex1-ans" placeholder="Enter number...">
+                            <button class="btn-sm" onclick="checkEx1()">Check Answer</button>
+                        </div>
+                        <div class="ex-feedback" id="ex1-fb"></div>
+                    </div>
+
+                    <!-- Ex 2 -->
+                    <div class="exercise-item" id="ex2">
+                        <div class="ex-badge">Exercise 2: L2 Norm (Vector Magnitude)</div>
+                        <p class="ex-question">
+                            What is the L2 Norm (length) of vector $\mathbf{a} = [3, 4]$? (Hint: $\|\mathbf{a}\| = \sqrt{3^2 + 4^2}$)
+                        </p>
+                        <div class="ex-interactive">
+                            <input type="number" id="ex2-ans" placeholder="Enter number...">
+                            <button class="btn-sm" onclick="checkEx2()">Check Answer</button>
+                        </div>
+                        <div class="ex-feedback" id="ex2-fb"></div>
+                    </div>
+
+                    <!-- Ex 3 -->
+                    <div class="exercise-item" id="ex3">
+                        <div class="ex-badge">Exercise 3: Orthogonality & Zero Similarity</div>
+                        <p class="ex-question">
+                            If two embedding vectors have a Cosine Similarity of exactly $0.0$, what is the geometric angle $\theta$ between them, and what does it mean for semantic meaning?
+                        </p>
+                        <div class="ex-options">
+                            <button class="opt-btn" onclick="checkEx3(this, false)">0° (Identical meaning)</button>
+                            <button class="opt-btn" onclick="checkEx3(this, true)">90° (Completely perpendicular / unrelated)</button>
+                            <button class="opt-btn" onclick="checkEx3(this, false)">180° (Direct opposite meaning)</button>
+                        </div>
+                        <div class="ex-feedback" id="ex3-fb"></div>
+                    </div>
+
+                    <!-- Ex 4 -->
+                    <div class="exercise-item" id="ex4">
+                        <div class="ex-badge">Exercise 4: Vector Normalization</div>
+                        <p class="ex-question">
+                            If vector $\mathbf{v} = [0, 5]$, what is its normalized unit vector $\hat{\mathbf{v}} = \frac{\mathbf{v}}{\|\mathbf{v}\|}$?
+                        </p>
+                        <div class="ex-options">
+                            <button class="opt-btn" onclick="checkEx4(this, true)">[0, 1]</button>
+                            <button class="opt-btn" onclick="checkEx4(this, false)">[0, 5]</button>
+                            <button class="opt-btn" onclick="checkEx4(this, false)">[0, 0.2]</button>
+                        </div>
+                        <div class="ex-feedback" id="ex4-fb"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
